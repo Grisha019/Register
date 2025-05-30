@@ -1,0 +1,37 @@
+﻿<Page x:Class="HeroAppNET.Views.RegPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:HeroAppNET.Views"
+      mc:Ignorable="d" 
+      d:DesignHeight="450" d:DesignWidth="800"
+      Title="Регистрация">
+
+    <Grid Margin="50" Background ="AliceBlue">
+        <!-- Заголовок страницы -->
+        <TextBlock Text="Вход" FontWeight="Bold" FontSize="16" HorizontalAlignment="Center" Margin="0,1,0,0"></TextBlock>
+        <!-- Регистрационная форма -->
+        <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <TextBlock Text="Имя:" FontSize="16"/>
+            <TextBox Width="250" Height="30" Margin="0,10,0,10"/>
+
+            <TextBlock Text="Логин:" FontSize="16"/>
+            <TextBox Width="250" Height="30" Margin="0,10,0,10"/>
+
+            <TextBlock Text="Почта:" FontSize="16"/>
+            <TextBox Width="250" Height="30" Margin="0,10,0,10"/>
+            
+            
+
+            <TextBlock Text="Пароль:" FontSize="16"/>
+            <PasswordBox Width="250" Height="30" Margin="0,10,0,10"/>
+
+            <!-- Кнопка Авторизации -->
+            <Button Content="Авторизация" Width="100" Height="30" Margin="0,10,0,10"/>
+
+            <!-- Кнопка Регистрации -->
+            <Button Content="Зарегистрироваться" Width="150" Height="30" Margin="0,10,0,10"/>
+        </StackPanel>
+    </Grid>
+</Page>
