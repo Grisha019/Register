@@ -1,46 +1,56 @@
-﻿using HeroAppNET.Models.Utilty;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using HeroAppNET.ViewModel.Base;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
 
 namespace HeroAppNET.Services.NavigationService
 {
     public class NavigationService : ObservableObject, INavigationService
     {
-        private NavigationService _instance;
-        private IServiceProvider _serviceProvider;
+        private readonly IServiceProvider _serviceProvider;
+        private ViewModelBase _currentView;
 
         public NavigationService(IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider;
         }
 
-        /*public static NavigationService GetInstance()
-        {
-            if (_instance == null)
-                _instance = new NavigationService();
-
-            return _instance;
-        }*/
-
-        private ViewModelBase _currentView;
-
         public ViewModelBase CurrentView
         {
             get => _currentView;
-            private set => Set(ref _currentView, value);
+            private set => SetProperty(ref _currentView, value);
         }
 
-        public void NavigateTo<TViewModelBase>() where TViewModelBase : ViewModelBase
+        public void NavigateTo<TViewModel>() where TViewModel : ViewModelBase
         {
-            //ViewModelBase newViewModel = (ViewModelBase)Activator.CreateInstance(typeof(TViewModelBase));
-            ViewModelBase newViewModel =
-                (ViewModelBase)_serviceProvider.GetRequiredService(typeof(TViewModelBase));
-            CurrentView = newViewModel;
-        }//
+            var viewModel = _serviceProvider.GetRequiredService<TViewModel>();
+
+            if (CurrentView?.GetType() == typeof(TViewModel))
+                return;
+
+            CurrentView = viewModel;
+
+            var mainWindow = Application.Current.MainWindow as FrameworkElement; // Change type to FrameworkElement  
+            if (mainWindow != null)
+            {
+                mainWindow.DataContext = CurrentView; // FrameworkElement supports DataContext  
+            }
+            else
+            {
+                var frame = Application.Current.MainWindow.FindName("MainFrame") as Frame;
+                if (frame != null)
+                {
+                    var viewType = viewModel.ViewType;
+                    if (viewType != null)
+                    {
+                        var view = (UIElement)_serviceProvider.GetRequiredService(viewType);
+                        frame.Content = view;
+                    }
+                }
+            }
+        }
     }
 }

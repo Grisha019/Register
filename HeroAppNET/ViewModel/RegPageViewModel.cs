@@ -1,16 +1,16 @@
 ﻿using HeroAppNET.Services.AuthenticationService;
-using HeroAppNET.ViewModel.Base;
 using HeroAppNET.Models;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.Input;
-
+using HeroAppNET.Models.Utilty;
+using HeroAppNET.ViewModel.Base;
 
 namespace HeroAppNET.ViewModel
 {
-    public partial class RegPageViewModel : ViewModelBase, INotifyPropertyChanged
+    public class RegPageViewModel : ViewModelBase
     {
         private readonly AuthService _authService = new AuthService();
 
