@@ -41,6 +41,6 @@ namespace HeroAppNET.Services.NavigationService
             ViewModelBase newViewModel =
                 (ViewModelBase)_serviceProvider.GetRequiredService(typeof(TViewModelBase));
             CurrentView = newViewModel;
-        }
+        }//
     }
 }

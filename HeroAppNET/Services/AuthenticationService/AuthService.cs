@@ -1,5 +1,6 @@
 ﻿using HeroAppNET.Infrastructure.ApplicationContext;
 using HeroAppNET.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,15 +18,15 @@ namespace HeroAppNET.Services.AuthenticationService
             _context = new ApplicationContext();
         }
 
-        public bool UserExists(string login, string email)
+        public async Task<bool> UserExistsAsync(string login, string email)
         {
-            return _context.Users.Any(u => u.Login == login || u.Email == email);
+            return await _context.Users.AnyAsync(u => u.Login == login || u.Email == email);
         }
 
-        public void Register(UserModel user)
+        public async Task RegisterAsync(UserModel user)
         {
-            _context.Users.Add(user);
-            _context.SaveChanges();
+            await _context.Users.AddAsync(user);
+            await _context.SaveChangesAsync();
         }
 
         internal bool Authenticate(Action login, string password)
