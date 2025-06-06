@@ -27,5 +27,15 @@ namespace HeroAppNET.Services.AuthenticationService
             _context.Users.Add(user);
             _context.SaveChanges();
         }
+
+        internal bool Authenticate(Action login, string password)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal bool Authenticate(string loginField, string password)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
