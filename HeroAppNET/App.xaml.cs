@@ -6,6 +6,7 @@ using HeroAppNET.ViewModel;
 using HeroAppNET.Views;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Configuration;
 using System.Data;
 using System.Windows;
@@ -22,6 +23,11 @@ namespace HeroAppNET
         {
             IServiceCollection services = new ServiceCollection();
 
+            // Регистрация DbContext
+            var optionsBuilder = new DbContextOptionsBuilder<ApplicationContext>();
+            optionsBuilder.UseSqlServer("Host=localhost;Port=5432;Database=WPF;Username=postgres;Password=123");
+
+
             services.AddDbContext<ApplicationContext>(options =>
             {
                 options.UseNpgsql("Host=localhost;Port=5432;Database=WPF;Username=postgres;Password=123");
@@ -31,6 +37,9 @@ namespace HeroAppNET
             services.AddTransient<RegPageViewModel>();
 
 
+
+
+           
 
 
             services.AddTransient<MainWindow>(provider => new MainWindow()
