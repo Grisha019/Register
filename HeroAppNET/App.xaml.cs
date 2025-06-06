@@ -4,74 +4,55 @@ using HeroAppNET.Services.InputService;
 using HeroAppNET.Services.NavigationService;
 using HeroAppNET.ViewModel;
 using HeroAppNET.Views;
-using Microsoft.EntityFrameworkCore;
+using HeroAppNET;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Configuration;
-using System.Data;
 using System.Windows;
+using Microsoft.EntityFrameworkCore;
 
-namespace HeroAppNET
+public partial class App : Application
 {
-    /// <summary>
-    /// Interaction logic for App.xaml
-    /// </summary>
-    public partial class App : Application
+    private readonly ServiceProvider _serviceProvider;
+
+    public App()
     {
-        private readonly ServiceProvider _serviceProvider;
-        public App()
+        IServiceCollection services = new ServiceCollection();
+
+        // Регистрация DbContext с PostgreSQL
+        services.AddDbContext<ApplicationContext>(options =>
         {
-            IServiceCollection services = new ServiceCollection();
+            options.UseNpgsql("Host=localhost;Port=5432;Database=WPF;Username=postgres;Password=123");
+        });
 
-            // Регистрация DbContext
-            var optionsBuilder = new DbContextOptionsBuilder<ApplicationContext>();
-            optionsBuilder.UseSqlServer("Host=localhost;Port=5432;Database=WPF;Username=postgres;Password=123");
+        services.AddTransient<MainWindowViewModel>();
+        services.AddTransient<RegPageViewModel>();
 
-
-            services.AddDbContext<ApplicationContext>(options =>
-            {
-                options.UseNpgsql("Host=localhost;Port=5432;Database=WPF;Username=postgres;Password=123");
-            });
-
-            services.AddTransient<MainWindowViewModel>();
-            services.AddTransient<RegPageViewModel>();
-
-
-
-
-           
-
-
-            services.AddTransient<MainWindow>(provider => new MainWindow()
-            {
-                DataContext = provider.GetRequiredService<MainWindowViewModel>()
-            });
-
-            services.AddTransient<RegPage>(provider => new RegPage()
-            {
-                DataContext = provider.GetRequiredService<RegPageViewModel>()
-            });
-
-
-            services.AddScoped<INavigationService, NavigationService>(provider =>
-                new NavigationService(provider));
-
-            services.AddSingleton<IInputService, InputService>();
-
-            _serviceProvider = services.BuildServiceProvider();
-            var activator = ActivatorDI.GetInstance();
-            activator.SetServiceProvider(_serviceProvider);
-        }
-
-        protected override void OnStartup(StartupEventArgs e)
+        services.AddTransient<MainWindow>(provider => new MainWindow()
         {
-            var mainWin = new MainWindow(); 
-            var regPage = _serviceProvider.GetRequiredService<RegPage>(); 
-            mainWin.Content = regPage;
-            mainWin.Show();
+            DataContext = provider.GetRequiredService<MainWindowViewModel>()
+        });
 
-            base.OnStartup(e);
-        }
+        services.AddTransient<RegPage>(provider => new RegPage()
+        {
+            DataContext = provider.GetRequiredService<RegPageViewModel>()
+        });
+
+        services.AddScoped<INavigationService, NavigationService>(provider =>
+            new NavigationService(provider));
+
+        services.AddSingleton<IInputService, InputService>();
+
+        _serviceProvider = services.BuildServiceProvider();
+        var activator = ActivatorDI.GetInstance();
+        activator.SetServiceProvider(_serviceProvider);
     }
 
+    protected override void OnStartup(StartupEventArgs e)
+    {
+        var mainWin = new MainWindow();
+        var regPage = _serviceProvider.GetRequiredService<RegPage>();
+        mainWin.Content = regPage;
+        mainWin.Show();
+
+        base.OnStartup(e);
+    }
 }

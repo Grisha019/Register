@@ -1,34 +1,34 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using HeroAppNET.Models;
-using HeroAppNET.Models.Items;
+﻿using HeroAppNET.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 
 namespace HeroAppNET.Infrastructure.ApplicationContext
 {
     public class ApplicationContext : DbContext
     {
-        private readonly IConfiguration _configuration;
-        public ApplicationContext(DbContextOptions<ApplicationContext> options) : base(options) 
+        public ApplicationContext(DbContextOptions<ApplicationContext> options)
+            : base(options)
         {
-            Database.EnsureDeleted();
-            Database.EnsureCreated();
-
-           
-   
-            this.SaveChanges();
         }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        // Конструктор без параметров нужен только если ты используешь PMC или Add-Migration
+        public ApplicationContext()
+            : base(GetOptions())
         {
-            optionsBuilder.UseSqlServer(_configuration.GetConnectionString("DefaultConnection"));
         }
 
-        public DbSet<HealPotion> HealPotions { get; set; }
+        private static DbContextOptions<ApplicationContext> GetOptions()
+        {
+            return new DbContextOptionsBuilder<ApplicationContext>()
+                .UseNpgsql("Host=localhost;Port=5432;Database=WPF;Username=postgres;Password=123")
+                .Options;
+        }
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+            // Тут можно добавить настройку моделей, если нужно
+        }
+
+        public DbSet<UserModel> Users { get; set; }
     }
 }

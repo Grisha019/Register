@@ -4,34 +4,33 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:HeroAppNET.Views"
+      xmlns:vm="clr-namespace:HeroAppNET.ViewModel"
+      xmlns:Services="clr-namespace:HeroAppNET.Services"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
       Title="Регистрация">
 
-    <Grid Margin="50" Background ="AliceBlue">
-        <!-- Заголовок страницы -->
-        <TextBlock Text="Вход" FontWeight="Bold" FontSize="16" HorizontalAlignment="Center" Margin="0,1,0,0"></TextBlock>
-        <!-- Регистрационная форма -->
+    <Page.DataContext>
+        <vm:RegPageViewModel />
+    </Page.DataContext>
+
+    <Grid Margin="50" Background="AliceBlue">
         <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
             <TextBlock Text="Имя:" FontSize="16"/>
-            <TextBox Width="250" Height="30" Margin="0,10,0,10"/>
+            <TextBox Width="250" Height="30" Margin="0,10,0,10" Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"/>
 
             <TextBlock Text="Логин:" FontSize="16"/>
-            <TextBox Width="250" Height="30" Margin="0,10,0,10"/>
+            <TextBox Width="250" Height="30" Margin="0,10,0,10" Text="{Binding Login, UpdateSourceTrigger=PropertyChanged}"/>
 
             <TextBlock Text="Почта:" FontSize="16"/>
-            <TextBox Width="250" Height="30" Margin="0,10,0,10"/>
-            
-            
+            <TextBox Width="250" Height="30" Margin="0,10,0,10" Text="{Binding Email, UpdateSourceTrigger=PropertyChanged}"/>
 
             <TextBlock Text="Пароль:" FontSize="16"/>
-            <PasswordBox Width="250" Height="30" Margin="0,10,0,10"/>
+            <PasswordBox Width="250" Height="30" Margin="0,10,0,10"
+                         Services:PasswordBoxHelper.BoundPassword="{Binding Password, Mode=TwoWay}" />
 
-            <!-- Кнопка Авторизации -->
-            <Button Content="Авторизация" Width="100" Height="30" Margin="0,10,0,10"/>
-
-            <!-- Кнопка Регистрации -->
-            <Button Content="Зарегистрироваться" Width="150" Height="30" Margin="0,10,0,10"/>
+            <Button Content="Зарегистрироваться" Width="150" Height="30" Margin="0,10,0,10"
+                    Command="{Binding RegisterCommand}"/>
         </StackPanel>
     </Grid>
 </Page>
