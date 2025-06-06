@@ -1,17 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace HeroAppNET.Views
 {
@@ -23,6 +13,18 @@ namespace HeroAppNET.Views
         public RegPage()
         {
             InitializeComponent();
+        }
+
+        // Обработчик клика по гиперссылке "Войти"
+        private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
+        {
+            // Навигация внутри приложения
+            NavigationService navService = NavigationService.GetNavigationService(this);
+            if (navService != null)
+            {
+                navService.Navigate(new Uri("/Views/LoginView.xaml", UriKind.Relative));
+            }
+            e.Handled = true;
         }
     }
 }
