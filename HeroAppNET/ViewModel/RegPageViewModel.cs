@@ -42,16 +42,16 @@ namespace HeroAppNET.ViewModel
             set { _password = value; OnPropertyChanged(); }
         }
 
-        public ICommand RegisterCommand { get; }
+        public IAsyncRelayCommand RegisterCommand { get; }
 
         public RegPageViewModel()
         {
-            RegisterCommand = new RelayCommand(Register);
+            RegisterCommand = new AsyncRelayCommand(RegisterAsync);
         }
 
-        private void Register()
+        private async Task RegisterAsync()
         {
-            if (_authService.UserExists(Login, Email))
+            if (await _authService.UserExistsAsync(Login, Email))
             {
                 MessageBox.Show("Пользователь с таким логином или почтой уже существует!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
@@ -65,11 +65,10 @@ namespace HeroAppNET.ViewModel
                 Password = Password
             };
 
-            _authService.Register(user);
+            await _authService.RegisterAsync(user);
 
             MessageBox.Show("Регистрация прошла успешно!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
 
-            // Очистка формы
             Name = string.Empty;
             Login = string.Empty;
             Email = string.Empty;
