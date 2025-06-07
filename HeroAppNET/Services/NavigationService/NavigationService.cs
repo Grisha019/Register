@@ -1,9 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using HeroAppNET.ViewModel.Base;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Windows;
 using System.Windows.Controls;
 
 namespace HeroAppNET.Services.NavigationService
@@ -11,14 +9,16 @@ namespace HeroAppNET.Services.NavigationService
     public class NavigationService : ObservableObject, INavigationService
     {
         private readonly IServiceProvider _serviceProvider;
-        private ViewModelBase _currentView;
+        private ViewModelBase? _currentView;
+
+        public Frame? Frame { get; set; }
 
         public NavigationService(IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider;
         }
 
-        public ViewModelBase CurrentView
+        public ViewModelBase? CurrentView
         {
             get => _currentView;
             private set => SetProperty(ref _currentView, value);
@@ -31,26 +31,29 @@ namespace HeroAppNET.Services.NavigationService
             if (CurrentView?.GetType() == typeof(TViewModel))
                 return;
 
-            CurrentView = viewModel;
+            if (viewModel.ViewType == null)
+                throw new InvalidOperationException($"ViewType не определён для {typeof(TViewModel).Name}");
 
-            var mainWindow = Application.Current.MainWindow as FrameworkElement; // Change type to FrameworkElement  
-            if (mainWindow != null)
-            {
-                mainWindow.DataContext = CurrentView; // FrameworkElement supports DataContext  
-            }
-            else
-            {
-                var frame = Application.Current.MainWindow.FindName("MainFrame") as Frame;
-                if (frame != null)
-                {
-                    var viewType = viewModel.ViewType;
-                    if (viewType != null)
-                    {
-                        var view = (UIElement)_serviceProvider.GetRequiredService(viewType);
-                        frame.Content = view;
-                    }
-                }
-            }
+            var view = (Page)_serviceProvider.GetRequiredService(viewModel.ViewType);
+            view.DataContext = viewModel;
+
+            CurrentView?.OnNavigatedFrom();
+            CurrentView = viewModel;
+            viewModel.OnNavigatedTo(null);
+
+            if (Frame == null)
+                throw new InvalidOperationException("Frame не установлен для NavigationService");
+
+            Frame.Navigate(view);
+        }
+
+        public void Navigate<TPage>() where TPage : Page
+        {
+            if (Frame == null)
+                throw new InvalidOperationException("Frame не установлен для NavigationService");
+
+            var page = _serviceProvider.GetRequiredService<TPage>();
+            Frame.Navigate(page);
         }
     }
 }

@@ -9,9 +9,9 @@ namespace HeroAppNET.Models.Utilty
 {
     public class ActivatorDI
     {
-        private static ActivatorDI Instance { get; set; }
+        private static ActivatorDI? Instance { get; set; } // Allow null values  
 
-        private IServiceProvider _serviceProvider;
+        private IServiceProvider _serviceProvider = null!; // Use null-forgiving operator to suppress CS8618  
 
         private ActivatorDI()
         {
@@ -27,7 +27,7 @@ namespace HeroAppNET.Models.Utilty
             return Instance;
         }
 
-        public void SetServiceProvider (IServiceProvider serviceProvider)
+        public void SetServiceProvider(IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider;
         }

@@ -8,21 +8,17 @@ namespace HeroAppNET.Models.Items
 {
     public abstract class Item
     {
-        public int Id { get => _id; set => _id = value; }
-        public string Title { get => _title; set => _title = value; }
-        public string Description { get => _description; set => _description = value; }
-        public string? Icon { get => _icon; set => _icon = value; }
+        public int Id { get; set; }
+        public string Title { get; set; }
+        public string Description { get; set; }
+        public string Icon { get; set; } = string.Empty; // Fix: Assign default value to avoid null  
 
-        protected int _id;
-        protected string _title;
-        protected string _description;
-        protected string _icon;
-
-        public Item(int id, string title, string description)
+        protected Item(int id, string title, string description)
         {
-            _id = id;
-            _title = title;
-            _description = description;
+            Id = id;
+            Title = title;
+            Description = description;
+            Icon = string.Empty; // Fix: Initialize Icon with a default value  
         }
 
         public abstract void InvetoryUse();

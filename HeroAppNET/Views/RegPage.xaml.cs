@@ -1,29 +1,43 @@
-﻿using System.Diagnostics;
-using System.Windows;
+﻿using HeroAppNET.Infrastructure.ApplicationContext;
+using HeroAppNET.ViewModel;
+using Microsoft.EntityFrameworkCore;
 using System.Windows.Controls;
+using HeroAppNET.Services.AuthenticationService;
 using System.Windows.Navigation;
+using System.Diagnostics;
 
 namespace HeroAppNET.Views
 {
-    /// <summary>
-    /// Логика взаимодействия для RegPage.xaml
-    /// </summary>
     public partial class RegPage : Page
     {
-        public RegPage()
+        // Конструктор через DI
+        public RegPage(RegPageViewModel viewModel)
         {
             InitializeComponent();
+            DataContext = viewModel;
         }
 
-        // Обработчик клика по гиперссылке "Войти"
+        // Конструктор для поддержки дизайнера
+        public RegPage() : this(new RegPageViewModel(CreateAuthService()))
+        {
+        }
+
+        // Метод для создания AuthService с контекстом
+        private static AuthService CreateAuthService()
+        {
+            var options = new DbContextOptionsBuilder<ApplicationContext>()
+                .UseSqlite("Data Source=app.db")
+                .Options;
+
+            var context = new ApplicationContext(options);
+            return new AuthService(context);
+        }
+
+        // Обработчик перехода по гиперссылке
         private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
         {
-            // Навигация внутри приложения
-            NavigationService navService = NavigationService.GetNavigationService(this);
-            if (navService != null)
-            {
-                navService.Navigate(new Uri("/Views/LoginView.xaml", UriKind.Relative));
-            }
+            // Навигация через NavigationService
+            App.NavigationService?.NavigateTo<LoginViewModel>();
             e.Handled = true;
         }
     }

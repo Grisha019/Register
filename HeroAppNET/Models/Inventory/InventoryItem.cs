@@ -10,10 +10,10 @@ namespace HeroAppNET.Models.Inventory
     public class InventoryItem
     {
         public int Id { get; set; }
-        public Item Item { get => _item; }
+        public Item? Item { get => _item; }
         public int Amount { get => _amount; set => _amount = value; }
 
-        private Item _item;
+        private Item? _item;
         private int _amount;
 
         public InventoryItem(Item item, int amount = 1)
@@ -28,9 +28,9 @@ namespace HeroAppNET.Models.Inventory
 
         public InventoryItem()
         {
-
+            // Инициализация полей значениями по умолчанию  
+            _item = null; // Устанавливаем значение null, так как Item является абстрактным  
+            _amount = 1;
         }
-
-
     }
 }
