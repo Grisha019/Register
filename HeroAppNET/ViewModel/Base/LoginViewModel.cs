@@ -39,34 +39,15 @@ public class LoginViewModel : ViewModelBase, INotifyPropertyChanged
     {
         try
         {
-            if (string.IsNullOrWhiteSpace(LoginField))
+            bool isAuthenticated = await _authService.AuthenticateAsync(LoginField, Password);
+            if (!isAuthenticated)
             {
-                MessageBox.Show("Введите логин", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-
-            if (string.IsNullOrWhiteSpace(Password))
-            {
-                MessageBox.Show("Введите пароль", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-
-            bool userExists = await _authService.UserExistsAsync(LoginField);
-            if (!userExists)
-            {
-                MessageBox.Show("Пользователь с таким логином не найден", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                return;
-            }
-
-            bool passwordCorrect = await _authService.AuthenticateAsync(LoginField, Password);
-            if (!passwordCorrect)
-            {
-                MessageBox.Show("Неверный пароль", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Неверный логин или пароль", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
 
             MessageBox.Show("Вход выполнен успешно!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
-            // TODO: Навигация на главную страницу
+            // Навигация
         }
         catch (Exception ex)
         {

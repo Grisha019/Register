@@ -2,6 +2,7 @@
 using HeroAppNET.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace HeroAppNET.Services.AuthenticationService
 {
@@ -9,45 +10,30 @@ namespace HeroAppNET.Services.AuthenticationService
     {
         private readonly ApplicationContext _context;
 
-        // Конструктор с DI для контекста базы данных  
         public AuthService(ApplicationContext context)
         {
             _context = context;
         }
 
-        /// <summary>
-        /// Проверяет, существует ли пользователь с таким логином или email.
-        /// </summary>
         public async Task<bool> UserExistsAsync(string login, string email)
         {
-            if (string.IsNullOrWhiteSpace(login) && string.IsNullOrWhiteSpace(email))
-                return false;
-
-            var userWithLogin = await _context.Users
-                .Where(u => u.Login == login)
-                .FirstOrDefaultAsync();
-
-            if (userWithLogin != null)
-                return true;
-
-            var userWithEmail = await _context.Users
-                .Where(u => u.Email == email)
-                .FirstOrDefaultAsync();
-
-            return userWithEmail != null;
+            return await _context.Users.AnyAsync(u => u.Login == login || u.Email == email);
         }
 
-        /// <summary>
-        /// Асинхронно регистрирует нового пользователя.
-        /// </summary>
         public async Task RegisterAsync(UserModel user)
         {
+            // ВАЖНО: Хешировать только если пароль ещё не хеширован!
+            if (!user.Password.StartsWith("$2a$")) // признак BCrypt
+            {
+                user.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
+            }
+
             await _context.Users.AddAsync(user);
             await _context.SaveChangesAsync();
         }
+
         public async Task<bool> UserExistsAsync(string login)
         {
-            // Пример: проверяем, есть ли пользователь с таким логином в базе данных
             return await _context.Users.AnyAsync(u => u.Login == login);
         }
 
@@ -55,24 +41,38 @@ namespace HeroAppNET.Services.AuthenticationService
         {
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Login == login);
             if (user == null)
+            {
+                MessageBox.Show("Пользователь не найден.");
                 return false;
+            }
 
-            // Если у тебя хранится хеш пароля, то здесь надо сделать проверку хеша, 
-            // для примера просто сравним строки
-            return user.Password == password;
+            // Для отладки — смотри хеш и ввод
+            MessageBox.Show($"Пароль из базы: {user.Password}\nВведённый: {password}");
+
+            // Сравниваем хеш
+            bool verified = BCrypt.Net.BCrypt.Verify(password, user.Password);
+            if (!verified)
+                MessageBox.Show("BCrypt.Verify вернул false");
+
+            return verified;
         }
 
-        /// <summary>
-        /// Проверяет учетные данные пользователя.
-        /// </summary>
         public async Task<bool> AuthenticateAsync(string login, string password)
         {
-            var user = await _context.Users
-                .FirstOrDefaultAsync(u => u.Login == login);
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Login == login);
+            if (user == null)
+            {
+                MessageBox.Show("Пользователь не найден");
+                return false;
+            }
 
-            if (user == null) return false;
+            MessageBox.Show($"Пароль из базы:\n{user.Password}\nВведённый: {password}");
 
-            return BCrypt.Net.BCrypt.Verify(password, user.Password);
+            bool result = BCrypt.Net.BCrypt.Verify(password, user.Password);
+            if (!result)
+                MessageBox.Show("Неверный пароль");
+
+            return result;
         }
     }
 }
