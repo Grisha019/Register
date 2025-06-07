@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace HeroAppNET.Models
+﻿namespace HeroAppNET.Models
 {
     public class UserModel
     {
@@ -13,5 +7,8 @@ namespace HeroAppNET.Models
         public string Login { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
+        public DateTime? BirthDate { get; set; }
+        public string Gender { get; set; } = string.Empty;
+        public int FootSize { get; set; }
     }
 }

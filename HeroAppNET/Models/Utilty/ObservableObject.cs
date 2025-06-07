@@ -10,12 +10,13 @@ namespace HeroAppNET.Models.Utilty
 {
     public class ObservableObject : INotifyPropertyChanged
     {
-        public event PropertyChangedEventHandler PropertyChanged;
+        // Fix for CS8612: Make the event nullable to match the interface definition  
+        public event PropertyChangedEventHandler? PropertyChanged;
 
+        // Fix for CS8618: Initialize the event to null explicitly  
         protected virtual void OnPropertyChanged([CallerMemberName] string paramName = "")
         {
-            if (PropertyChanged != null)
-                PropertyChanged.Invoke(this, new PropertyChangedEventArgs(paramName));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(paramName));
         }
 
         protected virtual bool Set<T>(ref T field, T value, [CallerMemberName] string paramName = "")
@@ -25,7 +26,6 @@ namespace HeroAppNET.Models.Utilty
             field = value;
             OnPropertyChanged(paramName);
             return true;
-
         }
     }
 }

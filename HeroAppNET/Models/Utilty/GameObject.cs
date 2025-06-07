@@ -15,14 +15,14 @@ namespace HeroAppNET.Models.Utilty
 
         private int _width;
         private int _height;
-        private Brush _color;
+        private Brush _color = Brushes.Transparent; // Initialize _color to a default value  
 
         private int _dx;
         private int _dy;
 
         public int X
         {
-            get => _x; 
+            get => _x;
             set => Set(ref _x, value);
         }
         public int Y
@@ -50,7 +50,7 @@ namespace HeroAppNET.Models.Utilty
 
         public int Dx
         {
-            get => _dx; 
+            get => _dx;
             set => Set(ref _dx, value);
         }
         public int Dy

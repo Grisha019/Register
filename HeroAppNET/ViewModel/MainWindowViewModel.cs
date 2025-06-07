@@ -15,7 +15,7 @@ namespace HeroAppNET.ViewModel
         public INavigationService LocalNavigationService
         {
             get => _navigationService;
-            private set => Set(ref _navigationService, value);
+            private set => Set(ref _navigationService, value); // Fix: Use SetProperty method from ViewModelBase  
         }
 
         public MainWindowViewModel(INavigationService navigationService)

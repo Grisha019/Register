@@ -1,11 +1,8 @@
 ﻿using HeroAppNET.Infrastructure.ApplicationContext;
 using HeroAppNET.Models;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace HeroAppNET.Services.AuthenticationService
 {
@@ -18,44 +15,64 @@ namespace HeroAppNET.Services.AuthenticationService
             _context = context;
         }
 
-        public AuthService()
-        {
-        }
-
         public async Task<bool> UserExistsAsync(string login, string email)
         {
-            // Assuming _context.Users is a DbSet<UserModel>  
             return await _context.Users.AnyAsync(u => u.Login == login || u.Email == email);
         }
 
         public async Task RegisterAsync(UserModel user)
         {
-            // Assuming _context.Users is a DbSet<UserModel>  
-            _context.Users.Add(user);
+            // ВАЖНО: Хешировать только если пароль ещё не хеширован!
+            if (!user.Password.StartsWith("$2a$")) // признак BCrypt
+            {
+                user.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
+            }
+
+            await _context.Users.AddAsync(user);
             await _context.SaveChangesAsync();
         }
 
-        public bool UserExists(string login, string email)
+        public async Task<bool> UserExistsAsync(string login)
         {
-            return _context.Users.Any(u => u.Login == login || u.Email == email);
+            return await _context.Users.AnyAsync(u => u.Login == login);
         }
 
-        public void Register(UserModel user)
+        public async Task<bool> CheckPasswordAsync(string login, string password)
         {
-            _context.Users.Add(user);
-            _context.SaveChanges();
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Login == login);
+            if (user == null)
+            {
+                MessageBox.Show("Пользователь не найден.");
+                return false;
+            }
+
+            // Для отладки — смотри хеш и ввод
+            MessageBox.Show($"Пароль из базы: {user.Password}\nВведённый: {password}");
+
+            // Сравниваем хеш
+            bool verified = BCrypt.Net.BCrypt.Verify(password, user.Password);
+            if (!verified)
+                MessageBox.Show("BCrypt.Verify вернул false");
+
+            return verified;
         }
 
-        internal bool Authenticate(Action login, string password)
+        public async Task<bool> AuthenticateAsync(string login, string password)
         {
-            // Implementation here  
-            return false;
-        }
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Login == login);
+            if (user == null)
+            {
+                MessageBox.Show("Пользователь не найден");
+                return false;
+            }
 
-        internal bool Authenticate(string loginField, string password)
-        {
-            // Implementation here  
-            return false;
+            MessageBox.Show($"Пароль из базы:\n{user.Password}\nВведённый: {password}");
+
+            bool result = BCrypt.Net.BCrypt.Verify(password, user.Password);
+            if (!result)
+                MessageBox.Show("Неверный пароль");
+
+            return result;
         }
     }
 }
